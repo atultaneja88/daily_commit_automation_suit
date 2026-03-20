@@ -55,4 +55,5 @@ jobs:
       # ─── 5. Push changes ─────────────────────────────────────────────
       - name: Push Commits
         run: |
-          git push origin HEAD
+          git pull --rebase origin main
+          git push origin main
