@@ -1,59 +1,59 @@
-name: 🤖 Daily Commit Automation
+# name: 🤖 Daily Commit Automation
 
-on:
-  schedule:
-    # Commit 1 → 9:00 AM IST (3:30 UTC)
-    - cron: "30 3 * * *"
-    # Commit 2 → 6:00 PM IST (12:30 UTC)
-    - cron: "30 12 * * *"
-  workflow_dispatch:   # ← allows manual trigger from GitHub UI
+# on:
+#   schedule:
+#     # Commit 1 → 9:00 AM IST (3:30 UTC)
+#     - cron: "30 3 * * *"
+#     # Commit 2 → 6:00 PM IST (12:30 UTC)
+#     - cron: "30 12 * * *"
+#   workflow_dispatch:   # ← allows manual trigger from GitHub UI
 
-permissions:
-  contents: write
+# permissions:
+#   contents: write
 
-jobs:
-  auto-commit:
-    name: Daily Auto Commit
-    runs-on: ubuntu-latest
+# jobs:
+#   auto-commit:
+#     name: Daily Auto Commit
+#     runs-on: ubuntu-latest
 
-    steps:
-      # ─── 1. Checkout repo ───────────────────────────────────────────
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+#     steps:
+#       # ─── 1. Checkout repo ───────────────────────────────────────────
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           fetch-depth: 0
 
-      # ─── 2. Configure Git identity ──────────────────────────────────
-      - name: Configure Git
-        run: |
-          git config user.name  "Daily Commit Bot 🤖"
-          git config user.email "bot@daily-commit.automation"
+#       # ─── 2. Configure Git identity ──────────────────────────────────
+#       - name: Configure Git
+#         run: |
+#           git config user.name  "Daily Commit Bot 🤖"
+#           git config user.email "bot@daily-commit.automation"
 
-      # ─── 3. Determine which commit slot this is ─────────────────────
-      - name: Detect Commit Slot
-        id: slot
-        run: |
-          HOUR=$(date -u +%H)
-          if [ "$HOUR" -lt 10 ]; then
-            echo "slot=morning" >> $GITHUB_OUTPUT
-            echo "label=🌅 Morning Pulse" >> $GITHUB_OUTPUT
-          else
-            echo "slot=evening" >> $GITHUB_OUTPUT
-            echo "label=🌆 Evening Sync" >> $GITHUB_OUTPUT
-          fi
+#       # ─── 3. Determine which commit slot this is ─────────────────────
+#       - name: Detect Commit Slot
+#         id: slot
+#         run: |
+#           HOUR=$(date -u +%H)
+#           if [ "$HOUR" -lt 10 ]; then
+#             echo "slot=morning" >> $GITHUB_OUTPUT
+#             echo "label=🌅 Morning Pulse" >> $GITHUB_OUTPUT
+#           else
+#             echo "slot=evening" >> $GITHUB_OUTPUT
+#             echo "label=🌆 Evening Sync" >> $GITHUB_OUTPUT
+#           fi
 
-      # ─── 4. Run the commit script ────────────────────────────────────
-      - name: Execute Commit Script
-        env:
-          COMMIT_SLOT: ${{ steps.slot.outputs.slot }}
-          COMMIT_LABEL: ${{ steps.slot.outputs.label }}
-        run: |
-          chmod +x scripts/daily_commit.sh
-          bash scripts/daily_commit.sh
+#       # ─── 4. Run the commit script ────────────────────────────────────
+#       - name: Execute Commit Script
+#         env:
+#           COMMIT_SLOT: ${{ steps.slot.outputs.slot }}
+#           COMMIT_LABEL: ${{ steps.slot.outputs.label }}
+#         run: |
+#           chmod +x scripts/daily_commit.sh
+#           bash scripts/daily_commit.sh
 
-      # ─── 5. Push changes ─────────────────────────────────────────────
-      - name: Push Commits
-        run: |
-          git pull --rebase origin main
-          git push origin main
+#       # ─── 5. Push changes ─────────────────────────────────────────────
+#       - name: Push Commits
+#         run: |
+#           git pull --rebase origin main
+#           git push origin main
